@@ -4,149 +4,93 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour, IDamageable
 {
     [Header("References")]
-    [SerializeField] private PlayerSettingsSO playerSettingsSo;
-    [SerializeField] private LayerMask groundLayer;
-    
-    [Header("Cameras: ")]
-    [SerializeField] private Camera _camera;
-    [SerializeField] private float minPitch = -10f;
-    [SerializeField] private float maxPitch = 45f;
-    
-    private float _yaw;
-    private float _pitch;
-    private Vector3 _movement;
-    private bool _isGrounded;
-    private bool _isCrouching;
-    private bool _jumpRequested;
-    private bool _isRunning = false;
-    private float _standHeight = 2f;
-    private float _crouchHeight = 1f;
-    private Vector3 _standCameraPos;
-    private Vector3 _crouchCameraPos;
-    
-    private Vector3 targetPoint;
-    private Vector2 _lastMousePos;
+    [SerializeField] private PlayerSettingsSO _playerSettingsSo;
+    [SerializeField] private LayerMask _groundLayer;
+    [SerializeField] private Animator _animator;
 
-    private HealthSystem _healthSystem;
-    private Rigidbody _rigidbody;
-    private CapsuleCollider _collider;
+    [Header("Cameras")] 
+    [SerializeField] private GameObject _aimPivot;
+    [SerializeField] private Camera _mainCamera;
+    [SerializeField] private float minPitch = -70f;
+    [SerializeField] private float maxPitch = 70f;
     
+    public PlayerSettingsSO PlayerSettings => _playerSettingsSo;
+    public LayerMask GroundLayer => _groundLayer;
+    public Animator Animator => _animator;
+    public Camera MainCamera => _mainCamera;
+    
+    public Rigidbody Rb { get; private set; }
+    public CapsuleCollider Col { get; private set; }
+    public Vector3 StandCameraPos { get; private set; }
+    public Vector3 CrouchCameraPos { get; private set; }
+    
+    private float _pitch;
+    private PlayerShoot _playerShoot;
+    private HealthSystem _healthSystem;
+
+    private PlayerBaseState _currentState;
+    public PlayerLocomotionState LocomotionState { get; private set; }
+    public PlayerCrouchState CrouchState { get; private set; }
+    public PlayerAirborneState AirborneState { get; private set; }
+
     public event Action onDie;
     public event Action<float, float> onDamage;
-
 
     private void Awake()
     {
         _healthSystem = GetComponent<HealthSystem>();
-        _rigidbody = GetComponent<Rigidbody>();
-        _collider = GetComponent<CapsuleCollider>();
+        Rb = GetComponent<Rigidbody>();
+        Col = GetComponent<CapsuleCollider>();
+        _playerShoot = GetComponent<PlayerShoot>();
         
-        _healthSystem.onDie += HealthSystemV2_onDie;
-        _healthSystem.onDamage += HealthSystem_OnDamage;
-    }
+        _healthSystem.onDie += () => onDie?.Invoke();
+        _healthSystem.onDamage += (c, t) => onDamage?.Invoke(c, t);
 
+        LocomotionState = new PlayerLocomotionState(this);
+        CrouchState = new PlayerCrouchState(this);
+        AirborneState = new PlayerAirborneState(this);
+    }
 
     private void Start()
     {
-        _standCameraPos = _camera.transform.localPosition; 
-        _crouchCameraPos = new Vector3(_standCameraPos.x, _standCameraPos.y - 0.5f, _standCameraPos.z); 
+        StandCameraPos = _mainCamera.transform.localPosition; 
+        CrouchCameraPos = new Vector3(StandCameraPos.x, StandCameraPos.y - 0.5f, StandCameraPos.z); 
+
+        SwitchState(LocomotionState);
     }
 
-    void Update()
+    private void Update()
     {
-        _movement = (transform.forward * Input.GetAxisRaw("Vertical") + transform.right * Input.GetAxisRaw("Horizontal")).normalized;
-        
-        CameraRotate();
-        Run();
-        if (Input.GetKeyDown(playerSettingsSo.crouchKey))
-            Crouch(true);
-        else if (Input.GetKeyUp(playerSettingsSo.crouchKey))
-            Crouch(false);
-        
-        if (Input.GetKeyDown(playerSettingsSo.jumpKey))
-            _jumpRequested = true;
-
+        _currentState.UpdateState(); 
+        CameraRotate(); 
     }
 
     private void FixedUpdate()
     {
-        Jump();
-        Movement();
+        _currentState.FixedUpdateState();
     }
 
-    private void OnDestroy()
+    public void SwitchState(PlayerBaseState newState)
     {
-        _healthSystem.onDie -= HealthSystemV2_onDie;
+        _currentState?.ExitState();
+        _currentState = newState;
+        _currentState.EnterState();
     }
-    
-    private void HealthSystem_OnDamage(float current, float total)
-    {
-        onDamage?.Invoke(current, total);
-    }
-    
-    private void HealthSystemV2_onDie()
-    {
-        onDie?.Invoke();
-    }
-    
-    private void Run()
-    {
-        if (Input.GetKeyDown(playerSettingsSo.runkey))
-            _isRunning = true; 
-        else if (Input.GetKeyUp(playerSettingsSo.runkey))
-            _isRunning = false;
-    }
-    
-    private void Movement()
-    {
-        float currentY = _rigidbody.linearVelocity.y;
-        
-        if (_isRunning && !_isCrouching)
-            _rigidbody.linearVelocity = new Vector3( _movement.x * playerSettingsSo.runSpeed, currentY, _movement.z * playerSettingsSo.runSpeed); 
-        else if (!_isRunning  && !_isCrouching)
-            _rigidbody.linearVelocity = new Vector3( _movement.x * playerSettingsSo.speed, currentY, _movement.z * playerSettingsSo.speed); 
-        else if (_isCrouching)
-            _rigidbody.linearVelocity = new Vector3( _movement.x * playerSettingsSo.crouchSpeed, currentY, _movement.z * playerSettingsSo.crouchSpeed); 
-    }
-    
-    private void Jump()
-    {
-        _isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f, groundLayer);
 
-        if (_jumpRequested && _isGrounded)
-        {
-            _rigidbody.AddForce(Vector3.up * playerSettingsSo.jumpForce, ForceMode.Impulse);
-            _jumpRequested = false;
-        }
-        else
-        {
-            _jumpRequested = false;
-        }
-    }
-    
-
-    private void Crouch(bool crouch)
-    {
-        _isCrouching = crouch;
-        _collider.height = crouch ? _crouchHeight : _standHeight;
-        _camera.transform.localPosition = crouch ? _crouchCameraPos : _standCameraPos;
-    }
-    
     private void CameraRotate()
     {
-        float mouseX = Input.GetAxis("Mouse X") * playerSettingsSo.mouseSens * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * playerSettingsSo.mouseSens * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * _playerSettingsSo.mouseSens * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * _playerSettingsSo.mouseSens * Time.deltaTime;
 
         _pitch -= mouseY;
         _pitch = Mathf.Clamp(_pitch, minPitch, maxPitch);
 
-        _camera.transform.localRotation = Quaternion.Euler(_pitch, 0, 0);
+        _mainCamera.transform.localRotation = Quaternion.Euler(_pitch, 0, 0);
+        _aimPivot.transform.localRotation = Quaternion.Euler(_pitch, 0, 0);
         transform.Rotate(Vector3.up * mouseX);
+        
+        _playerShoot.GetGrips();
     }
 
-
-    public void TakeDamage(float amount)
-    {
-        _healthSystem.TakeDamage(amount);
-    }
+    public void TakeDamage(float amount) => _healthSystem.TakeDamage(amount);
 }

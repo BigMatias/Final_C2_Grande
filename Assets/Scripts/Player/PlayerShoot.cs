@@ -23,7 +23,7 @@ public class PlayerShoot : MonoBehaviour
             TryShoot();
     }
 
-    private void LateUpdate()
+    public void GetGrips()
     {
         if (_currentWeapon == null) return;
 
