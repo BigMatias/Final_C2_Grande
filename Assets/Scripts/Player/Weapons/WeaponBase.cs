@@ -1,22 +1,53 @@
+using System;
 using UnityEngine;
 
 public abstract class WeaponBase : MonoBehaviour
 {
-    [SerializeField] protected WeaponDataSO _weaponDataSo;
+    [Header("Grips")]
     [SerializeField] private Transform _rightHandGrip;
     [SerializeField] private Transform _leftHandGrip;
 
-    private float _nextFireTime;
+    [Header("Points")]
+    [SerializeField] private Transform _sightPoint;
+    [SerializeField] private Transform _shootPoint;
 
+    [Header("Effects")]
+    [SerializeField] private MuzzleFlash _muzzleFlash;
+
+    public WeaponDataSO Data { get; private set; }
     public Transform RightHandGrip => _rightHandGrip;
     public Transform LeftHandGrip => _leftHandGrip;
+    public Transform SightPoint => _sightPoint;
+    public Transform ShootPoint => _shootPoint;
 
-    public void TryShoot(Ray ray)
+    protected ProjectilePool Pool { get; private set; }
+
+    public event Action OnFired;
+
+    private float _nextFireTime;
+
+    public void Initialize(WeaponDataSO data, ProjectilePool pool)
     {
-        if (Time.time < _nextFireTime) return;
-        _nextFireTime = Time.time + 1f / _weaponDataSo.fireRate;
-        Shoot(ray);
+        Data = data;
+        Pool = pool;
+        _nextFireTime = 0f;
     }
 
-    protected abstract void Shoot(Ray ray);
+    public bool TryFire(Ray aimRay)
+    {
+        if (Data == null || Time.time < _nextFireTime)
+            return false;
+
+        _nextFireTime = Time.time + Data.TimeBetweenShots;
+
+        Fire(aimRay);
+
+        if (_muzzleFlash != null)
+            _muzzleFlash.Play();
+
+        OnFired?.Invoke();
+        return true;
+    }
+
+    protected abstract void Fire(Ray aimRay);
 }

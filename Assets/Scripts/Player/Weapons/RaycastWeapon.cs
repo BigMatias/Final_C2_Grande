@@ -3,41 +3,55 @@ using UnityEngine;
 
 public class RaycastWeapon : WeaponBase
 {
-    [SerializeField] private LayerMask hitLayers;
-    [SerializeField] private LineRenderer bulletTracer;
-    [SerializeField] private float tracerDuration = 0.05f;
-    [SerializeField] protected Transform shootPoint;
-    
-    
-    protected override void Shoot(Ray ray)
+    [Header("Tracer")]
+    [SerializeField] private LineRenderer _bulletTracer;
+    [SerializeField] private float _tracerDuration = 0.03f;
+
+    private Coroutine _tracerRoutine;
+
+    private void Awake()
     {
-        Ray shootRay = shootPoint != null ? 
-            new Ray(shootPoint.position, shootPoint.forward) : ray;
-
-        Debug.DrawRay(shootRay.origin, shootRay.direction * _weaponDataSo.range, Color.yellow, 0.1f);
-
-        Vector3 endPoint;
-        if (Physics.Raycast(shootRay, out RaycastHit hit, _weaponDataSo.range, hitLayers))
-        {
-            hit.collider.GetComponentInParent<IDamageable>()?.TakeDamage(_weaponDataSo.damage);
-            endPoint = hit.point;
-        }
-        else
-        {
-            endPoint = shootRay.origin + shootRay.direction * _weaponDataSo.range;
-        }
-        
-        StartCoroutine(ShowTracer(shootRay.origin, endPoint));
+        if (_bulletTracer != null)
+            _bulletTracer.enabled = false;
     }
 
-    private IEnumerator ShowTracer(Vector3 start, Vector3 end)
+    protected override void Fire(Ray aimRay)
     {
-        bulletTracer.enabled = true;
-        bulletTracer.SetPosition(0, start);
-        bulletTracer.SetPosition(1, end);
+        Vector3 endPoint = aimRay.origin + aimRay.direction * Data.range;
 
-        yield return new WaitForSeconds(tracerDuration);
+        if (Physics.Raycast(aimRay, out RaycastHit hit, Data.range, Data.hitLayers, QueryTriggerInteraction.Ignore))
+        {
+            endPoint = hit.point;
 
-        bulletTracer.enabled = false;
+            IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
+            if (damageable != null)
+                damageable.TakeDamage(Data.damage);
+        }
+
+        ShowTracer(endPoint);
+    }
+
+    private void ShowTracer(Vector3 endPoint)
+    {
+        if (_bulletTracer == null || ShootPoint == null)
+            return;
+
+        if (_tracerRoutine != null)
+            StopCoroutine(_tracerRoutine);
+
+        _tracerRoutine = StartCoroutine(TracerRoutine(endPoint));
+    }
+
+    private IEnumerator TracerRoutine(Vector3 endPoint)
+    {
+        _bulletTracer.useWorldSpace = true;
+        _bulletTracer.SetPosition(0, ShootPoint.position);
+        _bulletTracer.SetPosition(1, endPoint);
+        _bulletTracer.enabled = true;
+
+        yield return new WaitForSeconds(_tracerDuration);
+
+        _bulletTracer.enabled = false;
+        _tracerRoutine = null;
     }
 }

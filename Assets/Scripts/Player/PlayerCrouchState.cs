@@ -8,8 +8,8 @@ public class PlayerCrouchState : PlayerBaseState
 
     public override void EnterState()
     {
-        ctx.Col.height = 1f; 
-        ctx.MainCamera.transform.localPosition = ctx.CrouchCameraPos;
+        ctx.Col.height = 1f;
+        ctx.Look.SetCrouched(true);
     }
 
     public override void UpdateState()
@@ -26,13 +26,12 @@ public class PlayerCrouchState : PlayerBaseState
 
     public override void FixedUpdateState()
     {
-        float currentY = ctx.Rb.linearVelocity.y;
-        ctx.Rb.linearVelocity = new Vector3(_movement.x * ctx.PlayerSettings.crouchSpeed, currentY, _movement.z * ctx.PlayerSettings.crouchSpeed);
+        MoveTowardsVelocity(_movement, ctx.PlayerSettings.crouchSpeed);
     }
-
+    
     public override void ExitState()
     {
-        ctx.Col.height = 2f; 
-        ctx.MainCamera.transform.localPosition = ctx.StandCameraPos;
+        ctx.Col.height = 2f;
+        ctx.Look.SetCrouched(false);
     }
 }
