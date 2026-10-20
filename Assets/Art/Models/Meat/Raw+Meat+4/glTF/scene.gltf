@@ -1,0 +1,339 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 1340,
+      "max": [
+        0.5993070006370544,
+        0.2442920058965683,
+        0.3276999890804291
+      ],
+      "min": [
+        -0.5943179726600647,
+        -0.23964500427246094,
+        -0.33084699511528015
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 16080,
+      "componentType": 5126,
+      "count": 1340,
+      "max": [
+        0.9999792575836182,
+        0.9995563626289368,
+        0.9996475577354431
+      ],
+      "min": [
+        -0.9995562434196472,
+        -0.9999618530273438,
+        -0.9999196529388428
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 1340,
+      "max": [
+        0.9921069145202637,
+        0.9987586736679077,
+        0.9999629259109497,
+        1.0
+      ],
+      "min": [
+        -0.9385537505149841,
+        -0.9999934434890747,
+        -0.9997089505195618,
+        1.0
+      ],
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 1340,
+      "max": [
+        1.0,
+        0.8327980041503906
+      ],
+      "min": [
+        -0.0,
+        -0.0
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 10720,
+      "componentType": 5126,
+      "count": 1340,
+      "max": [
+        1.0,
+        0.8327980041503906
+      ],
+      "min": [
+        -0.0,
+        -0.0
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 21440,
+      "componentType": 5126,
+      "count": 1340,
+      "max": [
+        1.0,
+        0.8327980041503906
+      ],
+      "min": [
+        -0.0,
+        -0.0
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 6756,
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "extras": {
+      "author": "plaggy (https://sketchfab.com/plaggy)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/cc0-raw-meat-4-f49758b8fde1451fa401edb8b86cd6f1",
+      "title": "CC0 - Raw Meat 4"
+    },
+    "generator": "Sketchfab-16.11.0",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 27024,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 32160,
+      "byteOffset": 27024,
+      "byteStride": 8,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 32160,
+      "byteOffset": 59184,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 21440,
+      "byteOffset": 91344,
+      "byteStride": 16,
+      "name": "floatBufferViews",
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 112784,
+      "uri": "scene.bin"
+    }
+  ],
+  "images": [
+    {
+      "uri": "textures/Material_46_baseColor.png"
+    },
+    {
+      "uri": "textures/Material_46_metallicRoughness.png"
+    },
+    {
+      "uri": "textures/Material_46_normal.png"
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material_46",
+      "normalTexture": {
+        "index": 2
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 1
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "RawMeat4_Material #46_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TANGENT": 2,
+            "TEXCOORD_0": 3,
+            "TEXCOORD_1": 4,
+            "TEXCOORD_2": 5
+          },
+          "indices": 6,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        2.220446049250313e-16,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Sketchfab_model"
+    },
+    {
+      "children": [
+        2
+      ],
+      "matrix": [
+        0.02539999969303608,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.02539999969303608,
+        0.0,
+        0.0,
+        -0.02539999969303608,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "7bf8f9e9cbeb481e8e7e9518df823f64.fbx"
+    },
+    {
+      "children": [
+        3
+      ],
+      "name": "RootNode"
+    },
+    {
+      "children": [
+        4
+      ],
+      "matrix": [
+        7.700686454772949,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.7098958815015995e-15,
+        -7.700686454772949,
+        0.0,
+        0.0,
+        7.700686454772949,
+        1.7098958815015995e-15,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "RawMeat4"
+    },
+    {
+      "children": [
+        5
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        -0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.002494513988494873,
+        -0.0023235008120536804,
+        0.0015735030174255371,
+        1.0
+      ],
+      "name": "Object_4"
+    },
+    {
+      "mesh": 0,
+      "name": "RawMeat4_Material #46_0"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Sketchfab_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    }
+  ]
+}

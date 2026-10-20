@@ -1,29 +1,20 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EnemySettings", menuName = "Enemy/Settings")]
-
+[CreateAssetMenu(fileName = "EnemyData", menuName = "Enemies/Enemy Data")]
 public class EnemyDataSO : ScriptableObject
 {
-    [Header("Normal Zombie: ")]
-    public float speed;
-    public float meleeDamage;
-    public float meleeRange;
-    public float meleeCd;
-    public float meleeActivateHitboxTime;
-    public int pointsGivenMelee;
-    [Header("Gun Zombie: ")] 
-    public float gunRange;
-    public float gunBulletLifetime;
-    public float gunBulletSpeed;
-    public float gunShootCooldown;
-    public float gunDamage;
-    public int pointsGivenRanged;
-    [Header("Granadier Zombie: ")]
-    public float granadeRange;
-    public float granadeLifeTime;
-    public float granadeCooldown;
-    public float granadeDamage;
-    public float granadeRadius;
-    public float granadeFlightTime;
-    public int pointsGivenGranadier;
-}  
+    [Header("Movement")]
+    public float moveSpeed = 1.8f;
+    public Vector2 speedVariation = new Vector2(0.9f, 1.1f);
+    public float acceleration = 6f;
+    public float angularSpeed = 360f;
+    public float repathInterval = 0.2f;
+
+    [Header("Attack")]
+    public float attackRange = 1.4f;
+    public float attackDamage = 15f;
+    public float attackCooldown = 1.2f;
+    public float attackDuration = 1f;
+    public float hitDelay = 0.45f;
+    public float hitRangeTolerance = 0.4f;
+}

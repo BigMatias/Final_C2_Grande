@@ -1,29 +1,24 @@
-using System;
 using UnityEngine;
 
-public class Projectile : MonoBehaviour
+public class Projectile : MonoBehaviour, IPoolable
 {
     [SerializeField] private TrailRenderer _trail;
 
     private Vector3 _velocity;
     private float _damage;
+    private float _impactForce;
     private float _gravityMultiplier;
     private float _remainingLifetime;
     private LayerMask _hitLayers;
-    private Action<Projectile> _release;
     private bool _isFlying;
 
-    public void SetRelease(Action<Projectile> release)
-    {
-        _release = release;
-    }
-
-    public void Launch(Vector3 position, Vector3 direction, float speed, float damage, float gravityMultiplier, float lifetime, LayerMask hitLayers)
+    public void Launch(Vector3 position, Vector3 direction, float speed, float damage, float impactForce, float gravityMultiplier, float lifetime, LayerMask hitLayers)
     {
         transform.SetPositionAndRotation(position, Quaternion.LookRotation(direction));
 
         _velocity = direction * speed;
         _damage = damage;
+        _impactForce = impactForce;
         _gravityMultiplier = gravityMultiplier;
         _remainingLifetime = lifetime;
         _hitLayers = hitLayers;
@@ -31,6 +26,17 @@ public class Projectile : MonoBehaviour
 
         if (_trail != null)
             _trail.Clear();
+    }
+
+    public void OnSpawnedFromPool()
+    {
+        if (_trail != null)
+            _trail.Clear();
+    }
+
+    public void OnReturnedToPool()
+    {
+        _isFlying = false;
     }
 
     private void Update()
@@ -59,11 +65,7 @@ public class Projectile : MonoBehaviour
         if (Physics.Raycast(start, displacement / distance, out RaycastHit hit, distance, _hitLayers, QueryTriggerInteraction.Ignore))
         {
             transform.position = hit.point;
-
-            IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
-            if (damageable != null)
-                damageable.TakeDamage(_damage);
-
+            HandleImpact(hit);
             Despawn();
             return;
         }
@@ -72,16 +74,30 @@ public class Projectile : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(_velocity);
     }
 
+    private void HandleImpact(RaycastHit hit)
+    {
+        DamageInfo info = new DamageInfo(_damage, hit.point, _velocity.normalized, _impactForce);
+
+        if (hit.collider.TryGetComponent(out IHittable hittable))
+        {
+            hittable.ReceiveHit(info);
+            return;
+        }
+
+        IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
+        if (damageable != null)
+            damageable.TakeDamage(_damage);
+
+        if (hit.rigidbody != null && !hit.rigidbody.isKinematic)
+            hit.rigidbody.AddForceAtPosition(info.Direction * _impactForce, hit.point, ForceMode.Impulse);
+    }
+
     private void Despawn()
     {
         if (!_isFlying)
             return;
 
         _isFlying = false;
-
-        if (_release != null)
-            _release(this);
-        else
-            Destroy(gameObject);
+        PooledObject.Despawn(gameObject);
     }
 }

@@ -10,7 +10,6 @@ public class PlayerShoot : MonoBehaviour
 
     private WeaponHandsIK _handsIK;
     private PlayerLook _look;
-    private ProjectilePool _projectilePool;
     private WeaponBase _currentWeapon;
 
     public WeaponBase CurrentWeapon => _currentWeapon;
@@ -22,7 +21,6 @@ public class PlayerShoot : MonoBehaviour
     {
         _handsIK = GetComponent<WeaponHandsIK>();
         _look = GetComponent<PlayerLook>();
-        _projectilePool = GetComponent<ProjectilePool>();
     }
 
     private void Start()
@@ -58,7 +56,7 @@ public class PlayerShoot : MonoBehaviour
         go.transform.localRotation = Quaternion.identity;
 
         _currentWeapon = go.GetComponent<WeaponBase>();
-        _currentWeapon.Initialize(weaponData, _projectilePool);
+        _currentWeapon.Initialize(weaponData);
 
         _handsIK.AttachToWeapon(_currentWeapon);
     }

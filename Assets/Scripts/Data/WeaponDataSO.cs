@@ -11,6 +11,7 @@ public class WeaponDataSO : ScriptableObject
     [Header("Damage")]
     public float damage = 25f;
     public float range = 100f;
+    public float impactForce = 4f;
     public LayerMask hitLayers = ~0;
 
     [Header("Projectile")]

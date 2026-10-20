@@ -17,6 +17,11 @@ public class HealthSystem : MonoBehaviour, IDamageable
         onLifeUpdated?.Invoke(life, maxLife);
     }
 
+    private void OnEnable()
+    {
+        ResetLife();
+    }
+
     public void ResetLife()
     {
         life = maxLife;

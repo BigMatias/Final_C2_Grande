@@ -2,18 +2,19 @@ using UnityEngine;
 
 public class ProjectileWeapon : WeaponBase
 {
+    [SerializeField] private PoolServiceSO _pool;
     [SerializeField] private float _minConvergenceDistance = 1.5f;
 
     protected override void Fire(Ray aimRay)
     {
-        if (Pool == null || Data.projectilePrefab == null || ShootPoint == null)
+        if (_pool == null || Data.projectilePrefab == null || ShootPoint == null)
             return;
 
         Vector3 origin = ShootPoint.position;
         Vector3 direction = GetFireDirection(aimRay, origin);
 
-        Projectile projectile = Pool.Get(Data.projectilePrefab);
-        projectile.Launch(origin, direction, Data.projectileSpeed, Data.damage, Data.projectileGravity, Data.ProjectileLifetime, Data.hitLayers);
+        Projectile projectile = _pool.Spawn(Data.projectilePrefab, origin, Quaternion.LookRotation(direction));
+        projectile.Launch(origin, direction, Data.projectileSpeed, Data.damage, Data.impactForce, Data.projectileGravity, Data.ProjectileLifetime, Data.hitLayers);
     }
 
     private Vector3 GetFireDirection(Ray aimRay, Vector3 origin)

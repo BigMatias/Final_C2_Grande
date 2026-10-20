@@ -1,6 +1,5 @@
-public interface IPooleable
+public interface IPoolable
 {
-    bool IsActive { get; }
-    void Activate();
-    void DeActivate();
+    void OnSpawnedFromPool();
+    void OnReturnedToPool();
 }

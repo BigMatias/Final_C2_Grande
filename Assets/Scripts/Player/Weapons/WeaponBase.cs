@@ -20,16 +20,13 @@ public abstract class WeaponBase : MonoBehaviour
     public Transform SightPoint => _sightPoint;
     public Transform ShootPoint => _shootPoint;
 
-    protected ProjectilePool Pool { get; private set; }
-
     public event Action OnFired;
 
     private float _nextFireTime;
 
-    public void Initialize(WeaponDataSO data, ProjectilePool pool)
+    public void Initialize(WeaponDataSO data)
     {
         Data = data;
-        Pool = pool;
         _nextFireTime = 0f;
     }
 
