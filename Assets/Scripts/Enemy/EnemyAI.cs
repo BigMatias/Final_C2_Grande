@@ -5,12 +5,14 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI : MonoBehaviour
 {
-    private enum State
+    public enum State
     {
         Chase,
         Attack
     }
 
+    public State CurrentState => _state;
+    
     [SerializeField] private EnemyDataSO _data;
 
     public event Action OnAttackStarted;
@@ -23,7 +25,8 @@ public class EnemyAI : MonoBehaviour
     private float _nextAttackTime;
     private float _attackTimer;
     private bool _hitApplied;
-
+    private int _chasePriority;
+    
     public EnemyDataSO Data => _data;
 
     private void Awake()
@@ -36,7 +39,8 @@ public class EnemyAI : MonoBehaviour
         _target = target;
         _targetDamageable = target != null ? target.GetComponent<IDamageable>() : null;
         _nextAttackTime = 0f;
-
+        _chasePriority = UnityEngine.Random.Range(_data.chaseAvoidancePriority.x, _data.chaseAvoidancePriority.y + 1);
+        
         ConfigureAgent();
         EnterChase();
     }
@@ -71,6 +75,7 @@ public class EnemyAI : MonoBehaviour
             _agent.isStopped = false;
 
         _agent.updateRotation = true;
+        _agent.avoidancePriority = _chasePriority;
     }
 
     private void UpdateChase()
@@ -96,6 +101,7 @@ public class EnemyAI : MonoBehaviour
         _attackTimer = 0f;
         _hitApplied = false;
 
+        _agent.avoidancePriority = _data.attackAvoidancePriority;
         _agent.isStopped = true;
         _agent.velocity = Vector3.zero;
         _agent.updateRotation = false;

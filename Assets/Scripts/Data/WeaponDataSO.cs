@@ -18,6 +18,7 @@ public class WeaponDataSO : ScriptableObject
     public Projectile projectilePrefab;
     public float projectileSpeed = 250f;
     public float projectileGravity = 0f;
+    public int projectilePoolSize = 30;
 
     [Header("Fire")]
     public float roundsPerMinute = 300f;

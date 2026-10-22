@@ -3,6 +3,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EnemyData", menuName = "Enemies/Enemy Data")]
 public class EnemyDataSO : ScriptableObject
 {
+    [Header("Avoidance")]
+    public Vector2Int chaseAvoidancePriority = new Vector2Int(40, 60);
+    public int attackAvoidancePriority = 5;
+    
     [Header("Movement")]
     public float moveSpeed = 1.8f;
     public Vector2 speedVariation = new Vector2(0.9f, 1.1f);

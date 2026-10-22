@@ -17,12 +17,14 @@ MonoBehaviour:
   price: 0
   damage: 10
   range: 10
+  impactForce: 6
   hitLayers:
     serializedVersion: 2
-    m_Bits: 1591
+    m_Bits: 3072
   projectilePrefab: {fileID: 5547929609779172433, guid: 0cb5f442c01cfa64793732b5785cc18e, type: 3}
   projectileSpeed: 250
   projectileGravity: 0
+  projectilePoolSize: 30
   roundsPerMinute: 300
   isAutomatic: 0
   weight: 1.2

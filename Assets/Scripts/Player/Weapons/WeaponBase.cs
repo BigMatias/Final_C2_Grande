@@ -28,6 +28,11 @@ public abstract class WeaponBase : MonoBehaviour
     {
         Data = data;
         _nextFireTime = 0f;
+        OnInitialized();
+    }
+
+    protected virtual void OnInitialized()
+    {
     }
 
     public bool TryFire(Ray aimRay)

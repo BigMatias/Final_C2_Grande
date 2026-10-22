@@ -117,6 +117,7 @@ MonoBehaviour:
   _sightPoint: {fileID: 7569063935242986388}
   _shootPoint: {fileID: 763863762601623115}
   _muzzleFlash: {fileID: 6790286971848133154}
+  _pool: {fileID: 11400000, guid: f40d6bfacde40984d9dd7f4c2a2065c7, type: 2}
   _minConvergenceDistance: 1.5
 --- !u!1 &4603293569324863292
 GameObject:

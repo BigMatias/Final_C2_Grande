@@ -5,10 +5,17 @@ using UnityEngine.Pool;
 [CreateAssetMenu(fileName = "PoolService", menuName = "Pooling/Pool Service")]
 public class PoolServiceSO : ScriptableObject
 {
+    private class PoolEntry
+    {
+        public ObjectPool<PooledObject> Pool;
+        public Transform ActiveContainer;
+        public Transform InactiveContainer;
+    }
+
     [SerializeField] private int _defaultCapacity = 16;
     [SerializeField] private int _maxSize = 512;
 
-    private readonly Dictionary<GameObject, ObjectPool<PooledObject>> _pools = new Dictionary<GameObject, ObjectPool<PooledObject>>();
+    private readonly Dictionary<GameObject, PoolEntry> _entries = new Dictionary<GameObject, PoolEntry>();
     private Transform _activeRoot;
     private Transform _inactiveRoot;
 
@@ -21,10 +28,10 @@ public class PoolServiceSO : ScriptableObject
 
     public void Clear()
     {
-        foreach (ObjectPool<PooledObject> pool in _pools.Values)
-            pool.Clear();
+        foreach (PoolEntry entry in _entries.Values)
+            entry.Pool.Clear();
 
-        _pools.Clear();
+        _entries.Clear();
         _activeRoot = null;
         _inactiveRoot = null;
     }
@@ -40,16 +47,18 @@ public class PoolServiceSO : ScriptableObject
         return SpawnInternal(prefab, position, rotation, parent).gameObject;
     }
 
+    public void Prewarm<T>(T prefab, int count) where T : Component
+    {
+        Prewarm(prefab.gameObject, count);
+    }
+
     public void Prewarm(GameObject prefab, int count)
     {
-        ObjectPool<PooledObject> pool = GetPool(prefab);
-        List<PooledObject> instances = new List<PooledObject>(count);
+        PoolEntry entry = GetEntry(prefab);
+        int missing = count - entry.Pool.CountInactive;
 
-        for (int i = 0; i < count; i++)
-            instances.Add(pool.Get());
-
-        foreach (PooledObject instance in instances)
-            pool.Release(instance);
+        for (int i = 0; i < missing; i++)
+            entry.Pool.Release(CreateInstance(prefab, entry));
     }
 
     public void Release(PooledObject instance)
@@ -57,21 +66,22 @@ public class PoolServiceSO : ScriptableObject
         if (instance == null)
             return;
 
-        if (!_pools.TryGetValue(instance.Prefab, out ObjectPool<PooledObject> pool))
+        if (!_entries.TryGetValue(instance.Prefab, out PoolEntry entry))
         {
             Destroy(instance.gameObject);
             return;
         }
 
-        pool.Release(instance);
+        entry.Pool.Release(instance);
     }
 
     private PooledObject SpawnInternal(GameObject prefab, Vector3 position, Quaternion rotation, Transform parent)
     {
-        PooledObject instance = GetPool(prefab).Get();
+        PoolEntry entry = GetEntry(prefab);
+        PooledObject instance = entry.Pool.Get();
         Transform instanceTransform = instance.transform;
 
-        instanceTransform.SetParent(parent != null ? parent : GetActiveRoot(), false);
+        instanceTransform.SetParent(parent != null ? parent : entry.ActiveContainer, false);
         instanceTransform.SetPositionAndRotation(position, rotation);
 
         instance.gameObject.SetActive(true);
@@ -80,27 +90,34 @@ public class PoolServiceSO : ScriptableObject
         return instance;
     }
 
-    private ObjectPool<PooledObject> GetPool(GameObject prefab)
+    private PoolEntry GetEntry(GameObject prefab)
     {
-        if (_pools.TryGetValue(prefab, out ObjectPool<PooledObject> pool))
-            return pool;
+        if (_entries.TryGetValue(prefab, out PoolEntry entry))
+            return entry;
 
-        pool = new ObjectPool<PooledObject>(
-            () => CreateInstance(prefab),
+        entry = new PoolEntry
+        {
+            ActiveContainer = CreateContainer(prefab.name, GetActiveRoot()),
+            InactiveContainer = CreateContainer(prefab.name, GetInactiveRoot())
+        };
+
+        entry.Pool = new ObjectPool<PooledObject>(
+            () => CreateInstance(prefab, entry),
             null,
-            OnReleaseInstance,
+            instance => OnReleaseInstance(instance, entry),
             OnDestroyInstance,
             false,
             _defaultCapacity,
             _maxSize);
 
-        _pools.Add(prefab, pool);
-        return pool;
+        _entries.Add(prefab, entry);
+        return entry;
     }
 
-    private PooledObject CreateInstance(GameObject prefab)
+    private PooledObject CreateInstance(GameObject prefab, PoolEntry entry)
     {
-        GameObject instance = Instantiate(prefab, GetInactiveRoot());
+        GameObject instance = Instantiate(prefab, entry.InactiveContainer);
+        instance.name = prefab.name;
         instance.SetActive(false);
 
         if (!instance.TryGetComponent(out PooledObject pooled))
@@ -110,17 +127,24 @@ public class PoolServiceSO : ScriptableObject
         return pooled;
     }
 
-    private void OnReleaseInstance(PooledObject instance)
+    private void OnReleaseInstance(PooledObject instance, PoolEntry entry)
     {
         instance.NotifyReleased();
         instance.gameObject.SetActive(false);
-        instance.transform.SetParent(GetInactiveRoot(), false);
+        instance.transform.SetParent(entry.InactiveContainer, false);
     }
 
     private void OnDestroyInstance(PooledObject instance)
     {
         if (instance != null)
             Destroy(instance.gameObject);
+    }
+
+    private static Transform CreateContainer(string containerName, Transform parent)
+    {
+        Transform container = new GameObject(containerName).transform;
+        container.SetParent(parent, false);
+        return container;
     }
 
     private Transform GetActiveRoot()

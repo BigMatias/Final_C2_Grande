@@ -5,9 +5,17 @@ public class ProjectileWeapon : WeaponBase
     [SerializeField] private PoolServiceSO _pool;
     [SerializeField] private float _minConvergenceDistance = 1.5f;
 
+    protected override void OnInitialized()
+    {
+        if (!IsConfigured())
+            return;
+
+        _pool.Prewarm(Data.projectilePrefab, Data.projectilePoolSize);
+    }
+
     protected override void Fire(Ray aimRay)
     {
-        if (_pool == null || Data.projectilePrefab == null || ShootPoint == null)
+        if (!IsConfigured())
             return;
 
         Vector3 origin = ShootPoint.position;
@@ -15,6 +23,29 @@ public class ProjectileWeapon : WeaponBase
 
         Projectile projectile = _pool.Spawn(Data.projectilePrefab, origin, Quaternion.LookRotation(direction));
         projectile.Launch(origin, direction, Data.projectileSpeed, Data.damage, Data.impactForce, Data.projectileGravity, Data.ProjectileLifetime, Data.hitLayers);
+    }
+
+    private bool IsConfigured()
+    {
+        if (_pool == null)
+        {
+            Debug.LogWarning($"{name}: falta asignar el Pool en ProjectileWeapon.", this);
+            return false;
+        }
+
+        if (Data.projectilePrefab == null)
+        {
+            Debug.LogWarning($"{name}: el WeaponData no tiene Projectile Prefab asignado.", this);
+            return false;
+        }
+
+        if (ShootPoint == null)
+        {
+            Debug.LogWarning($"{name}: falta asignar el Shoot Point.", this);
+            return false;
+        }
+
+        return true;
     }
 
     private Vector3 GetFireDirection(Ray aimRay, Vector3 origin)
