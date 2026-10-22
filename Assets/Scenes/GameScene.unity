@@ -638,7 +638,7 @@ MonoBehaviour:
   - {fileID: 887451473}
   _headWeightThreshold: 0.5
   _pool: {fileID: 11400000, guid: f40d6bfacde40984d9dd7f4c2a2065c7, type: 2}
-  _explosionPrefab: {fileID: 0}
+  _explosionPrefab: {fileID: 8458774476437580104, guid: ac8bb1e1b22bce741bbeac435c3cbd25, type: 3}
   _neckBleedPrefab: {fileID: 0}
   _neckStump: {fileID: 2659203057633203439, guid: 9ec0dbc197d5e0a4d8edca6135ef49cf, type: 3}
   _gibPrefabs:
@@ -3654,6 +3654,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0dd7cec7e8230264fac8407ac56c36ef, type: 3}
+--- !u!1001 &5714804309207621527
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 573666024131946747, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -5.88068
+      objectReference: {fileID: 0}
+    - target: {fileID: 573666024131946747, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.68397
+      objectReference: {fileID: 0}
+    - target: {fileID: 573666024131946747, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -16.04678
+      objectReference: {fileID: 0}
+    - target: {fileID: 573666024131946747, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 573666024131946747, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 573666024131946747, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 573666024131946747, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 573666024131946747, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 573666024131946747, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 573666024131946747, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8392460197776274161, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
+      propertyPath: m_Name
+      value: NeckBleedFX
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b8bad45cc65502749bb03d8753cdc62d, type: 3}
 --- !u!1001 &7507553605974921450
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3839,3 +3896,4 @@ SceneRoots:
   - {fileID: 8436329717903116842}
   - {fileID: 2184372085137287966}
   - {fileID: 7628540409673300782}
+  - {fileID: 5714804309207621527}
