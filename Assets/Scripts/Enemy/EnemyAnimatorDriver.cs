@@ -24,7 +24,7 @@ public class EnemyAnimatorDriver : MonoBehaviour, IPoolable
             return;
 
         _animator.SetFloat(SpeedHash, _agent.velocity.magnitude, _dampTime, Time.deltaTime);
-        _animator.SetInteger(StateHash, (int)_ai.CurrentState);
+        _animator.SetInteger(StateHash, (int)_ai.CurrentStateId);
     }
 
     public void OnSpawnedFromPool()

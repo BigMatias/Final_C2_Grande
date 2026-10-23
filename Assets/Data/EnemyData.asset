@@ -17,9 +17,11 @@ MonoBehaviour:
   acceleration: 6
   angularSpeed: 360
   repathInterval: 0.2
+  chaseAvoidancePriority: {x: 40, y: 60}
+  attackAvoidancePriority: 5
   attackRange: 1.4
   attackDamage: 15
   attackCooldown: 1.2
-  attackDuration: 1
+  attackDuration: 2
   hitDelay: 0.45
   hitRangeTolerance: 0.4

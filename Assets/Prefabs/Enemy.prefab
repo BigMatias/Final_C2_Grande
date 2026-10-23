@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 1495473431907880653}
   - component: {fileID: 8654783525780562993}
   - component: {fileID: 7905831019451489585}
+  - component: {fileID: 2149824946005016782}
   - component: {fileID: 5127844061219576825}
   - component: {fileID: 58012708392426877}
   m_Layer: 9
@@ -110,6 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56903e4df594d0d4d934a31b139da410, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitReaction
+  _pivot: {fileID: 1619510289820498755}
   _spineBones:
   - bone: {fileID: 1301911722010691792}
     weight: 0.3
@@ -120,6 +122,8 @@ MonoBehaviour:
   _hitBoneWeight: 1.5
   _degreesPerDamage: 0.6
   _maxDegrees: 35
+  _referenceLever: 0.5
+  _baseBend: 0.3
   _recoverySpeed: 8
 --- !u!114 &7321677210038463961
 MonoBehaviour:
@@ -136,7 +140,7 @@ MonoBehaviour:
   _slowMultiplier: 0.4
   _heavyHitDamage: 50
   _pushPerForce: 0.03
-  _maxPush: 0.25
+  _maxPush: 0
 --- !u!114 &7823989433261440172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156,6 +160,7 @@ MonoBehaviour:
   - {fileID: 7905831019451489585}
   _deathForceMultiplier: 1.5
   _upwardBias: 0.25
+  _corpseLayerName: Corpse
 --- !u!114 &1495473431907880653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,6 +188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   _data: {fileID: 11400000, guid: e642f0013ea8a9845ba844e97be48038, type: 2}
+  _testTarget: {fileID: 0}
 --- !u!114 &7905831019451489585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -197,6 +203,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimatorDriver
   _animator: {fileID: 921503027681329581}
   _dampTime: 0.1
+--- !u!114 &2149824946005016782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8417145811438958047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c8b28f8c3be994e9aaf835325e2815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BloodDecalSpawner
+  _pool: {fileID: 11400000, guid: f40d6bfacde40984d9dd7f4c2a2065c7, type: 2}
+  _decalPrefab: {fileID: 6467804109270419468, guid: a2b230aae4be4124d9fb93c2e107f405, type: 3}
+  _surfaceLayers:
+    serializedVersion: 2
+    m_Bits: 1024
+  _atlasColumns: 2
+  _atlasRows: 2
+  _exitDistance: 3
+  _hitSizeRange: {x: 0.35, y: 0.7}
+  _floorChance: 0.5
+  _floorSizeRange: {x: 0.25, y: 0.5}
+  _headshotSizeRange: {x: 0.9, y: 1.5}
+  _headshotSplatCount: 3
+  _headshotSpread: 0.35
+  _floorRayDistance: 3
+  _depth: 0.5
 --- !u!195 &5127844061219576825
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -642,6 +676,11 @@ Animator:
 --- !u!4 &1301911722010691792 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -3480699329000672020, guid: 923a4b5dd6c54b046becf6514cd95d82, type: 3}
+  m_PrefabInstance: {fileID: 6747311119647652924}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1619510289820498755 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5465940246521907071, guid: 923a4b5dd6c54b046becf6514cd95d82, type: 3}
   m_PrefabInstance: {fileID: 6747311119647652924}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2196738157437014388 stripped

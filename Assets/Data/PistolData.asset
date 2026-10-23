@@ -17,7 +17,7 @@ MonoBehaviour:
   price: 0
   damage: 10
   range: 10
-  impactForce: 6
+  impactForce: 5
   hitLayers:
     serializedVersion: 2
     m_Bits: 3072

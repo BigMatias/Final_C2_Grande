@@ -1,144 +1,77 @@
-using System;
 using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI : MonoBehaviour
 {
-    public enum State
-    {
-        Chase,
-        Attack
-    }
-
-    public State CurrentState => _state;
-    
     [SerializeField] private EnemyDataSO _data;
+    [SerializeField] private Transform _testTarget;
 
-    public event Action OnAttackStarted;
-
-    private NavMeshAgent _agent;
-    private Transform _target;
-    private IDamageable _targetDamageable;
-    private State _state;
-    private float _nextRepathTime;
-    private float _nextAttackTime;
-    private float _attackTimer;
-    private bool _hitApplied;
-    private int _chasePriority;
-    
     public EnemyDataSO Data => _data;
+    public NavMeshAgent Agent { get; private set; }
+    public Transform Target { get; private set; }
+    public IDamageable TargetDamageable { get; private set; }
+    public int ChasePriority { get; private set; }
+    public float NextAttackTime { get; set; }
+
+    public EnemyChaseState ChaseState { get; private set; }
+    public EnemyAttackState AttackState { get; private set; }
+
+    public EnemyStateId CurrentStateId => _currentState != null ? _currentState.Id : EnemyStateId.Chase;
+
+    private EnemyBaseState _currentState;
 
     private void Awake()
     {
-        _agent = GetComponent<NavMeshAgent>();
+        Agent = GetComponent<NavMeshAgent>();
+        ChaseState = new EnemyChaseState(this);
+        AttackState = new EnemyAttackState(this);
+    }
+
+    private void Start()
+    {
+        if (Target == null && _testTarget != null)
+            Initialize(_testTarget);
     }
 
     public void Initialize(Transform target)
     {
-        _target = target;
-        _targetDamageable = target != null ? target.GetComponent<IDamageable>() : null;
-        _nextAttackTime = 0f;
-        _chasePriority = UnityEngine.Random.Range(_data.chaseAvoidancePriority.x, _data.chaseAvoidancePriority.y + 1);
-        
+        Target = target;
+        TargetDamageable = target != null ? target.GetComponent<IDamageable>() : null;
+        NextAttackTime = 0f;
+        ChasePriority = Random.Range(_data.chaseAvoidancePriority.x, _data.chaseAvoidancePriority.y + 1);
+
         ConfigureAgent();
-        EnterChase();
-    }
 
-    private void ConfigureAgent()
-    {
-        float variation = UnityEngine.Random.Range(_data.speedVariation.x, _data.speedVariation.y);
-
-        _agent.speed = _data.moveSpeed * variation;
-        _agent.acceleration = _data.acceleration;
-        _agent.angularSpeed = _data.angularSpeed;
-        _agent.stoppingDistance = _data.attackRange * 0.8f;
+        _currentState = null;
+        SwitchState(ChaseState);
     }
 
     private void Update()
     {
-        if (_target == null || !_agent.enabled || !_agent.isOnNavMesh)
+        if (_currentState == null || Target == null || !Agent.enabled || !Agent.isOnNavMesh)
             return;
 
-        if (_state == State.Chase)
-            UpdateChase();
-        else
-            UpdateAttack();
+        _currentState.Update();
     }
 
-    private void EnterChase()
+    public void SwitchState(EnemyBaseState nextState)
     {
-        _state = State.Chase;
-        _nextRepathTime = 0f;
-
-        if (_agent.enabled && _agent.isOnNavMesh)
-            _agent.isStopped = false;
-
-        _agent.updateRotation = true;
-        _agent.avoidancePriority = _chasePriority;
+        _currentState?.Exit();
+        _currentState = nextState;
+        _currentState.Enter();
     }
 
-    private void UpdateChase()
+    public bool IsTargetInRange(float range)
     {
-        if (Time.time >= _nextRepathTime)
-        {
-            _agent.SetDestination(_target.position);
-            _nextRepathTime = Time.time + _data.repathInterval;
-        }
-
-        if (!IsTargetInRange(_data.attackRange))
-            return;
-
-        FaceTarget();
-
-        if (Time.time >= _nextAttackTime)
-            EnterAttack();
+        Vector3 offset = Target.position - transform.position;
+        offset.y = 0f;
+        return offset.sqrMagnitude <= range * range;
     }
 
-    private void EnterAttack()
+    public void FaceTarget()
     {
-        _state = State.Attack;
-        _attackTimer = 0f;
-        _hitApplied = false;
-
-        _agent.avoidancePriority = _data.attackAvoidancePriority;
-        _agent.isStopped = true;
-        _agent.velocity = Vector3.zero;
-        _agent.updateRotation = false;
-
-        OnAttackStarted?.Invoke();
-    }
-
-    private void UpdateAttack()
-    {
-        _attackTimer += Time.deltaTime;
-        FaceTarget();
-
-        if (!_hitApplied && _attackTimer >= _data.hitDelay)
-        {
-            _hitApplied = true;
-            TryHitTarget();
-        }
-
-        if (_attackTimer >= _data.attackDuration)
-        {
-            _nextAttackTime = Time.time + _data.attackCooldown;
-            EnterChase();
-        }
-    }
-
-    private void TryHitTarget()
-    {
-        if (_targetDamageable == null)
-            return;
-
-        if (IsTargetInRange(_data.attackRange + _data.hitRangeTolerance))
-            _targetDamageable.TakeDamage(_data.attackDamage);
-    }
-
-    private void FaceTarget()
-    {
-        Vector3 direction = _target.position - transform.position;
+        Vector3 direction = Target.position - transform.position;
         direction.y = 0f;
 
         if (direction.sqrMagnitude < 0.0001f)
@@ -148,10 +81,13 @@ public class EnemyAI : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _data.angularSpeed * Time.deltaTime);
     }
 
-    private bool IsTargetInRange(float range)
+    private void ConfigureAgent()
     {
-        Vector3 offset = _target.position - transform.position;
-        offset.y = 0f;
-        return offset.sqrMagnitude <= range * range;
+        float variation = Random.Range(_data.speedVariation.x, _data.speedVariation.y);
+
+        Agent.speed = _data.moveSpeed * variation;
+        Agent.acceleration = _data.acceleration;
+        Agent.angularSpeed = _data.angularSpeed;
+        Agent.stoppingDistance = _data.attackRange * 0.8f;
     }
 }
